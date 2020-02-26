@@ -1,0 +1,53 @@
+Write an evaluator based on the grammar from hw3. The basic semantic rules are
+as follows: the first item in a compound expression is always an identifier,
+and the compound expression itself is interpreted as a function application.
+Evaluation is eager, i.e. innermost applications are evaluated first. Literals
+evaluate to themselves, i.e. '3.14' becomes a <real> with the value 3.14. Only
+numeric literals are relevant in this homework, and all numeric literals
+represent reals (floats). Besides literals, implement the following objects:
+
+ - (vector <real>+)        # <real>+ means 1 or more objects of type <real>
+ - (matrix <vector>+)      # each vector is one row, starting from the top
+
+And these operations on them:
+
+ - (+ <vector> <vector>)   # → <vector> -- vector addition
+ - (dot <vector> <vector>) # → <real>  -- dot product
+ - (+ <matrix> <matrix>)   # → <matrix> -- matrix addition
+ - (* <matrix> <matrix>)   # → <matrix> -- matrix multiplication
+ - (det <matrix>)          # → <real>  -- determinant of the matrix
+ - (solve <matrix>)        # → <vector> -- linear homogeneous equation solver
+ - (dft <vector>)          # → <vector> -- discrete fourier transform
+
+For `solve`, the argument is a matrix of coefficients and the result is an
+assignment of variables -- if there are multiple solutions, return a non-zero
+one.
+
+    system  | matrix | written as
+ x + y = 0  |  1  1  | (matrix (vector 1  1)
+    -y = 0  |  0 -1  |         (vector 0 -1))
+
+For `dft`, the input is a vector of *real* numbers and the output is again a
+vector of real numbers -- the magnitudes of the complex coefficients obtained
+from the transform. For an input of length n, the output should have n / 2 + 1
+real entries if n is even and ( n + 1 ) / 2 otherwise.
+
+Expressions with argument type mismatches (both in object constructors and in
+operations), attempts to construct a matrix where the individual vectors
+(rows) are not of the same length, addition of differently-shaped matrices,
+multiplication of incompatible matrices, addition or dot product of
+different-sized vectors, and so on, should evaluate to an <error> object. Any
+expression with an <error> as an argument is also an <error>.
+
+The evaluator should be available as 'eval()' and take a string for an
+argument. The result should be an object with methods `is_real()`,
+`is_vector()`, `is_matrix()` and `is_error()`. Iterating vectors gives reals
+and iterating matrices gives vectors. `float(x)` for `x.is_real()` should do
+the right thing.
+
+You can use `numpy` in this homework (in addition to standard modules).
+
+# Version History
+
+2019-11-09: Clarified the expected output of `dft` and fixed the
+inconsistencies requirements for `solve`.

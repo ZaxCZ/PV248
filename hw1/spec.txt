@@ -1,0 +1,75 @@
+Your first assignment will be to implement an object hierarchy. The classes
+will model a simplified library (the kind where you can borrow books). The
+following classes are required: `Author`, `Reader`, `Clerk`, `Book`,
+`Department` and `Library`.
+
+How you store actual data is entirely up to you, but you must be able to
+provide the attributes and methods specified below. You are free (and
+encouraged) to use inheritance where appropriate, and to create additional
+classes or methods where they make sense.
+
+# Attributes, Methods and Types
+
+ - `Author`, `Reader` and `Clerk` all have a `name` (a string attribute)
+ - `Author` has `born` and `died` which are either a `date` or `None`
+ - `Reader` has a `born` attribute which is always a `date`
+
+ - `Library` has these methods:
+    - `departments()` which is always a list of `Department` instances
+    - `books()` which is a list of all books owned by the library,
+    - `available_books()` which lists books that are not currently lent,
+    - `staff()` which is a list of all `Clerk` instances working at the library
+
+ - `Department` has:
+    - a `staff()` method, which is a list of `Clerk` instances,
+    - `books()` which lists books owned by that `Department`, and
+    - `available_books()` which lists books that are not currently lent
+
+ - `Department` can `add_staff(whom)`, where `whom` is either a string (in
+   which case a new `Clerk` instance is created) or an existing `Clerk`
+   instance... in both cases, the relevant `Clerk` instance is returned
+
+ - `Book` has a `name` (a string), `authors` (a list of `Author` instances),
+   `date_published` (a `date` or `None`), a `publisher` and an `isbn` (the
+   last two being strings)
+
+ - `Reader` has a `borrow(book, clerk)` method which causes a book to be
+   checked out, and a `give_back(book)` which returns the given book to the
+   library
+
+ - `Book` has methods `is_borrowed()`, `borrowed_by()` and `lent_by()` which
+   return, respectively, a boolean, a `Reader` and a `Clerk`
+
+ - `Library` can create other objects (and each method returns the object it
+   has created):
+    - `add_book()`, which has keyword arguments `name`, `authors`,
+      `date_published`, `publisher` and `isbn` which correspond to the
+      attributes of a `Book`, and a `department` keyword argument which
+      expects a `Department` instance
+    - `add_author()` with keyword arguments corresponding to `Author`
+      attributes...
+    - `add_reader()` ditto
+    - `add_department()` ditto
+
+- calling `Library()` with no args should create a new, empty library
+
+# Constraints
+
+The list returned by the `staff()` method for `Department` contains the subset
+of `Clerk` instances returned by the same method in `Library`. Every `Clerk`
+instance on the `Library` staff is present in at least one `Department` list
+of staff. None of the `staff()` methods are allowed to list the same `Clerk`
+instance more than once.
+
+Similar constraints apply to books, but unlike staff, those may not be shared
+by multiple departments: a `Book` is in exactly one department. Multiple
+copies of the same book may exist, but they always get separate `Book`
+instances.
+
+For any given combination of `name`, `born` and `died`, only a single `Author`
+instance may exist and `add_author()` is required to return the matching
+instance if one already exists.
+
+# Edit History
+
+2019-09-27: mention `Library.add_department` and construction of a `Library`

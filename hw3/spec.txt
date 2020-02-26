@@ -1,0 +1,54 @@
+Write a simple LISP (expression) parser, following this EBNF grammar:
+
+    expression  = atom | compound ;
+    compound    = '(', expression, { whitespace, expression }, ')' ;
+    whitespace  = ( ' ' | ? newline ? ), { ' ' | ? newline ? }
+    atom        = literal | identifier ;
+    literal     = number | string | boolean ;
+
+    digit       = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' ;
+    sign        = '+' | '-' ;
+    boolean     = '#f' | '#t' ;
+    number      = [ sign ], digit, { digit }, [ '.', digit, { digit } ] ;
+    string      = '"', { string_char }, '"' ;
+    string_char = ? any character except '"' and '\' ? | '\"' | '\\' ;
+
+    identifier  = id_init, { id_subseq } | sign ;
+    id_init     = ? alphabetic character ? | '!' | '$' | '%' | '&' | '*' |
+                  '/' | ':' | '<' | '=' | '>' | '?' | '^' | '_' | '~' ;
+    id_subseq   = id_init | digit | id_special ;
+    id_special  = '+' | '-' | '.' | '@' ;
+
+Alphabetic characters are those for which `isalpha()` returns true. It is okay
+to accept additional whitespace where it makes sense. For the semantics of
+(ISO) EBNF, see e.g. wikipedia.
+
+The parser should be implemented in `lisp.py` as a toplevel function called
+`parse` that takes a single `str` argument. Assuming `expr` is a string with a
+valid expression, the following should hold about `x = parse(expr)`:
+
+ - an `x.is_foo()` method is provided for each of the major nonterminals:
+   compound, atom, literal, boolean, number, string and identifier (e.g. there
+   should be an `is_atom()` method), returning a boolean
+ - if `x.is_compound()` is true, `x` should be iterable, yielding
+   sub-expressions as objects which also implement this interface
+ - if `x.is_boolean()` is true, `bool(x)` should work
+ - if `x.is_number()` is true, basic arithmetic (+, -, *, /) and relational
+   (<, >, ==, !=) operators should work (e.g. `x < 7`, or `x * x`) as well as
+   `int(x)`
+ - `x == parse(expr)` should be true (i.e. equality should be extensional)
+ - `x == parse(str(x))` should also hold
+
+Behaviour is unspecified if a numeric literal with a decimal dot is converted
+to an int. A few examples of valid inputs (one per line):
+
+    (+ 1 2 3)
+    (eq? (quote a b c) (quote a c b))
+    12.7
+    (concat "abc" "efg" "ugly \"string\"")
+    (set! var ((stuff) #t #f))
+    (< #t #t)
+
+# Edit History
+
+2019-10-26: Renamed 'types.py' to 'classes.py', since the former is reserved.

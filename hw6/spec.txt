@@ -1,0 +1,54 @@
+NB. Preliminary version. Please check back later for a final version.
+
+Implement the 'battleship' guessing game on top of the chat protocol from
+homework 5. The basic spec does not include user interaction, just an API.
+You can do a user interface as a bonus (see `bonus.txt`).
+
+The game is encapsulated in an object of class Battleship, which has methods
+described in the following. The protocol itself is up to you. The game is
+played on a 10x10 board.
+
+Initial game setup:
+
+ - `connect(nick, chan)` where `nick` and `chan` are strings which conform to
+   the respective rules from hw5; this method establishes connection to the
+   chat server, sets the nick and joins the requested channel
+ - `put_ship( x, y, size, vertical )` puts a ship of a given size at position
+   x, y where x is the column and y is the row, with (0, 0) being the upper
+   left corner; if `vertical` is True, then the ship extends downwards, and if
+   it is False, it extends to the right ... this method must be called exactly
+   5 times before `start()` or `join()` are called, with sizes 5, 4, 3, 3, 2
+   (in any order)
+ - start() announces a new game on the channel and waits for the second
+   player to join
+ - list_games() returns a list of nicks (strings) of players who announced a
+   game and are waiting for the second player to join; each subsequent call
+   blocks until the list changes since the last call; never returns an empty
+   list (i.e. blocks until it can return a non-empty list)
+ - auto() joins a random game, or starts a new one if there are no active
+   offers; it blocks until a game can start
+ - join(nick) joins a game announced by `nick`
+
+When two players pair up, other clients should become aware (as soon as
+practical) that the game is no longer on offer; disappearance of games should
+be reflected by `list_games()`. Nonetheless, there is an inherent race
+condition and multiple players may try to join the same game. One of them must
+be accepted by the initiator and the rest must be rejected.
+
+Gameplay: one shot is fired by each side in a round. The shots are
+simultaneous. Methods which implement the gameplay:
+
+ - `enemy()` returns the state of the enemy board, as a list of lists (each
+   row is represented by a single list)... the cells are encoded as 'h' for
+   hit, 'm' for miss and '?' for unknown
+ - `board()` the same format but for the player's own board; instead of '?',
+   the cell might be 'w' for water or 's' for ship
+ - `round( x, y )` play one round, shooting at position given by x, y
+ - `finished()` returns True if the game is over
+ - `won()` returns True if we won
+ - `draw()` returns True if the game ended in a draw
+
+After the game concludes, calling `restart()` keeps the connection to the
+server open, but wipes all other state. Ships can be laid out again and a new
+game can be joined or initiated. All initialization methods and the `round()`
+method are async (i.e. coroutines), the rest are standard subroutines.

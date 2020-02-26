@@ -1,0 +1,58 @@
+The second assignment centers around persistent data: in particular JSON and
+SQL-based databases. We will continue with the toy model of a library from the
+first homework -- the goal will be to add the ability to store and load the
+library and its constituents in the two forms mentioned above: as JSON
+(structured text) and in a relational database, via SQL.
+
+The object interface from `hw1` should be retained. Additionally, `Library`
+should get these additional methods: `to_json()`, `from_json(json)`,
+`from_sql(conn, lib_id)` and `to_sql(conn)`. The return value of `to_json()`
+should be a `str` object which contains valid JSON (as described below), and
+the `json` argument to `from_json()` should likewise be a `str` with valid
+JSON in it. The `conn` argument in the SQL functions is an active instance of
+`sqlite3.Connection`. In the `from_sql()` method, the `lib_id` argument is an
+`int` which identifies which library to load from the database. The `to_sql()`
+function should return the `id` of the newly stored library.
+
+Both `from_` methods, if called on an already-populated `Library` instance,
+should first clear any data already present in the object (or otherwise ensure
+that after the call, the content of the library exactly corresponds to the
+state stored in the database or in the JSON).
+
+For JSON, each python object should be represented by a JSON object, a python
+list should be represented by a JSON array and so on. Use strings to represent
+dates (in a format that you can read back). In addition to attributes
+specified in `hw1`, the departments of a library, and the books and staff of a
+department (which are accessible via methods in python) should be stored as if
+they were attributes.
+
+For SQL, each object type should get a separate relation (i.e. a table), with
+non-list attributes as columns. Where appropriate, include an 'id' column as a
+primary key. List-like attributes should be stored using foreign keys. The
+column holding the foreign key referencing table `foo` should be named
+`foo_id`. If a helper table is required (in an M:N case), it should be named
+`foo_bar_list` if it represents the list of `bar` instances stored in `foo`.
+More realistic examples would be `book_author_list`, or
+`department_book_list`. It is admissible to store multiple `Library` instances
+in the same database, and both `to_sql` and `from_sql` should correctly handle
+this situation. Note that separate `Library` instances are not allowed to
+share any objects.
+
+In the JSON case, there is an additional challenge: object identity. We have
+classes for which identity matters (like Clerk, where multiple clerks can have
+identical attributes, but not be the same object).  There is no ‘native’
+solution for this in JSON, and the best we can do is to manage unique object
+identifiers ourselves. Where needed, add an '$id' key to the object being
+serialized and replace any later occurrences of the same object (by object
+identity) with a dictionary that only has a '$ref' key. The identifiers must
+be unique for any given object type, and may also be unique across all object
+types (your parser is allowed to rely on this property if your writer has it).
+For example, the following is a JSON list which contains 2 references to the
+same object:
+
+    [ { "$id": 33, "name": "Dorian Gray" }, { "$ref": 33 } ]
+
+Both JSON and SQL support NULLs to represent missing values. Use this facility
+to represent attributes which may legally have a `None` value in the python
+world. Make sure that the only nullable columns in the SQL schema are those
+that need to be.
